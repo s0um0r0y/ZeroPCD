@@ -1,0 +1,15 @@
+experiment_name: "pointnet_vanilla"
+hardware:
+  device: "cuda"
+  mixed_precision: true  # Essential for the 6GB VRAM constraint
+data:
+  dataset_path: "./data/raw/ModelNet10"
+  num_points: 512
+  batch_size: 16
+model:
+  use_tnet: true
+  global_feat: true
+training:
+  epochs: 50
+  learning_rate: 0.001
+  weight_decay: 0.0001

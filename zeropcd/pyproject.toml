@@ -1,0 +1,17 @@
+[project]
+name = "zeropcd"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=2.0.2",
+    "pyyaml>=6.0.3",
+    "tensorboard>=2.20.0",
+    "torch>=2.5.1",
+    "torchvision>=0.20.1",
+    "tqdm>=4.66.5",
+]
+
+[[tool.uv.index]]
+url = "https://download.pytorch.org/whl/cu121"
