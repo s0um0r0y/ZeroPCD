@@ -32,3 +32,30 @@ def load_config(config_path: str | Path) -> ConfigNode:
         except yaml.YAMLError as exc:
             raise ValueError(f"Error parsing YAML file: {exc}")
         
+def get_args_and_config():
+    """
+    Parses command line arguments to allow dynamic config loading.
+    Usage: python scripts/train.py --config configs/debug.yaml
+    """
+    parser = argparse.ArgumentParser(description="zero-pcd: Point Cloud Deep Learning")
+    parser.add_argument(
+        '--config', 
+        type=str, 
+        default='configs/default.yaml', 
+        help='Path to the YAML configuration file'
+    )
+    
+    args = parser.parse_args()
+    config = load_config(args.config)
+    
+    return args, config
+
+if __name__ == "__main__":
+    test_config_path = Path("../../configs/default.yaml")
+    if test_config_path.exists():
+        config = load_config(test_config_path)
+        print("Config successfully loaded!")
+        print(f"Experiment Name: {config.experiment_name}")
+        print(f"Num Points: {config.data.num_points}")
+    else:
+        print("YAML config not found. Make sure to create it first!")
