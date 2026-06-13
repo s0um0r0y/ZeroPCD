@@ -16,3 +16,19 @@ class ConfigNode:
                 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
+    
+def load_config(config_path: str | Path) -> ConfigNode:
+    """
+    Loads a YAML configuration file and returns it as a ConfigNode.
+    """
+    config_path = Path(config_path)
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found at: {config_path}")
+
+    with open(config_path, 'r') as file:
+        try:
+            config_dict = yaml.safe_load(file)
+            return ConfigNode(config_dict)
+        except yaml.YAMLError as exc:
+            raise ValueError(f"Error parsing YAML file: {exc}")
+        
