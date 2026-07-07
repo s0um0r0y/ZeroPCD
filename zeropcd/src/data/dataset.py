@@ -38,3 +38,37 @@ class PointSampler:
         else:
             idx = np.random.choice(len(verts), self.output_size, replace=True)
         return verts[idx]
+    
+class Normalize:
+    """
+    Centers the point cloud at the origin (0,0,0) and scales it to fit 
+    inside a sphere of radius 1. This prevents exploding gradients.
+    """
+    def __call__(self, pointcloud):
+        # translate, substract the mean (center of mass)
+        centroid = np.mean(pointcloud, axis=0)
+        pointcloud = pointcloud - centroid
+        
+        # scale, divide by maximum distance from the origin
+        m = np.max(np.sqrt(np.sum(pointcloud**2, axis=1)))
+        pointcloud = pointcloud /m
+        
+        return pointcloud
+    
+class RandRotation_z:
+    """
+    Multiplies the point cloud by a 3D rotation matrix around the Z-axis.
+    Linear Algebra core: R_z(theta) * Vector
+    """
+    def __call__(self, pointcloud):
+        theta = random.random() * 2. * math.pi
+        
+        # Define the Z-axis rotation matrix
+        rot_matrix = np.array([
+            [ math.cos(theta), -math.sin(theta),    0],
+            [ math.sin(theta),  math.cos(theta),    0],
+            [0,                 0,                  1]
+        ])
+        
+        return rot_matrix.dot(pointcloud.T).T
+    
