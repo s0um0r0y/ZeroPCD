@@ -72,3 +72,11 @@ class RandRotation_z:
         
         return rot_matrix.dot(pointcloud.T).T
     
+class RandomNoise:
+    """
+    Adds Gaussian noise (Jitter) to the point coordinates.
+    """
+    def __call__(self, pointcloud):
+        noise = np.random.normal(0, 0.02, (pointcloud.shape))
+        return pointcloud + noise 
+    
