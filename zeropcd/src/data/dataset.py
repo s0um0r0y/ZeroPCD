@@ -80,3 +80,33 @@ class RandomNoise:
         noise = np.random.normal(0, 0.02, (pointcloud.shape))
         return pointcloud + noise 
     
+class ToTensor:
+    """Converts numpy arrays to PyTorch Tensors."""
+    def __call__(self, pointcloud):
+        return torch.from_numpy(pointcloud).float()
+    
+class ModelNet10Dataset(Dataset):
+    def __init__(self, root_dir, valid = False, num_points=512):
+        super().__init__()
+        self.root_dir = Path(root_dir)
+        folder = "test" if valid else "train"
+        
+        self.classes = {dir: i for i, dir in enumerate(sorted(os.listdir(root_dir))) if os.path.isdir(self.root_dir/dir)}
+        
+        self.files = []
+        for class_name in self.classes.keys():
+            class_dir = self.root_dir / class_name / folder
+            for file in os.listdir(class_dir):
+                if file.endswith('.off'):
+                    self.files.append({
+                        'path': class_dir / file,
+                        'category': self.classes[class_name]
+                    })
+        
+        # Define the transformation pipeline
+        # Validation doesn't get Rotation or Noise (we want to test on canonical shapes)
+        if valid:
+            self.transforms = [PointSampler(num_points), Normalize(), ToTensor()]
+        else:
+            self.transforms = [PointSampler(num_points), Normalize(), RandRotation_z(), RandomNoise(), ToTensor()]
+             
