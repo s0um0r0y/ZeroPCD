@@ -1,4 +1,3 @@
-from nt import replace
 import os
 import math
 import random
@@ -131,7 +130,7 @@ class ModelNet10Dataset(Dataset):
         
 if __name__ == "__main__":
     # Test the dataset loader if run directly
-    test_path = "../../data/raw/ModelNet10"
+    test_path = "/home/soumoroy/ZeroPCD/zeropcd/data/raw/ModelNet10/ModelNet10"
     if os.path.exists(test_path):
         train_ds = ModelNet10Dataset(test_path, valid=False, num_points=512)
         print(f"Loaded {len(train_ds)} training shapes.")
