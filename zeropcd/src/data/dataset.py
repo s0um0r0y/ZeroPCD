@@ -110,3 +110,35 @@ class ModelNet10Dataset(Dataset):
         else:
             self.transforms = [PointSampler(num_points), Normalize(), RandRotation_z(), RandomNoise(), ToTensor()]
              
+    def __len__(self):
+        return len(self.files)
+    
+    def __getitem__(self, idx):
+        item = self.files[idx]
+        
+        verts, _ = read_off(item['path'])
+        
+        # apply transformations sequnetially
+        pointcloud = verts
+        for transform in self.transforms:
+            pointcloud = transform(pointcloud)
+            
+        # Return a dictionary containing the point cloud and its integer label
+        return {
+            'pointcloud': pointcloud, 
+            'category': item['category']
+        }
+        
+if __name__ == "__main__":
+    # Test the dataset loader if run directly
+    test_path = "../../data/raw/ModelNet10"
+    if os.path.exists(test_path):
+        train_ds = ModelNet10Dataset(test_path, valid=False, num_points=512)
+        print(f"Loaded {len(train_ds)} training shapes.")
+        print(f"Classes: {train_ds.classes}")
+        
+        sample = train_ds[0]
+        print(f"Sample Point Cloud Shape: {sample['pointcloud'].shape}") # Expected: [512, 3]
+        print(f"Sample Category Label: {sample['category']}")
+    else:
+        print(f"Please download the dataset to {test_path} first.")
