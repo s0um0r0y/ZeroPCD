@@ -1,3 +1,4 @@
+from turtle import forward
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -27,4 +28,27 @@ class TNet3D(nn.Module):
         self.bn4 = nn.BatchNorm1d(512)
         self.bn5 = nn.BatchNorm1d(256)
         
-    
+    def forward(self, x):
+        batch_size = x.size(0)
+        
+        # spatial feature extraction
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        
+        # symetric operation : max pooling across all points
+        x = torch.max(x, 2, keepdim = True)[0]
+        x = x.view(-1, 1024)
+        
+        # regression network
+        x = F.relu(self.bn4(self.fc1(x)))
+        x = F.relu(self.bn5(self.fc2(x)))
+        
+        # Initialize transformation as an Identity Matrix to ease optimization
+        iden = torch.eye(3, requires_grad=True).repeat(batch_size, 1, 1)
+        if x.is_cuda:
+            iden = iden.cuda()
+            
+        matrix = self.fc3(x).view(-1, 3, 3)
+        matrix = matrix + iden
+        return matrix
