@@ -1,6 +1,29 @@
 # ZeroPCD
 Deep learning experimental work on poinclouds
 
+## ideation
+- unordered set of $N$ points, each with $D$ dimensions (e.g., $x, y, z$)
+
+$$f(\{x_1, \dots, x_n\}) \approx g(h(x_1), \dots, h(x_n))$$
+
+- $h$: A multi-layer perceptron (MLP) mapped to each point individually (implemented via 1D Convolutions).
+- $g$: The Max Pooling operation, which selects the maximum value across the point dimension, making the global feature invariant to the input sequence order.
+
+### T-Net (Spatial Transformer)
+- PointNet uses a mini-network called T-Net to predict an affine transformation matrix $T$. 
+- The input points are then multiplied by this matrix to align them to a canonical space.For an input cloud $X \in \mathbb{R}^{N \times 3}$, T-Net predicts a matrix $T \in \mathbb{R}^{3 \times 3}$. 
+- The aligned cloud is computed via matrix multiplication:
+
+$$X_{aligned} = X \cdot T$$
+
+### loss functions
+
+- Because optimizing an unconstrained 9-element matrix is unstable, a regularization term is added to the loss function to force $T$ close to an orthogonal matrix (preserving rigid transformations like rotation without scaling/shearing)
+
+$$L_{reg} = \Vert{}I - T T^T\Vert{}_F^2$$
+
+- Where $\Vert{}\cdot\Vert{}_F$ is the Frobenius norm, computed as the square root of the sum of the absolute squares of its elements.
+
 ## layout
 ```
 open-point/
