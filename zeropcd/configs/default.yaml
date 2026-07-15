@@ -3,7 +3,7 @@ hardware:
   device: "cuda"
   mixed_precision: true  # Essential for the 6GB VRAM constraint
 data:
-  dataset_path: "./data/raw/ModelNet10"
+  dataset_path: "/home/soumoroy/ZeroPCD/zeropcd/data/raw/ModelNet10/ModelNet10"
   num_points: 512
   batch_size: 16
 model:
