@@ -102,3 +102,21 @@ class PointNetFeat(nn.Module):
             # For segmentation tasks, concatenate global features back to local features
             global_feat_repeat = global_feature.view(-1, 1024, 1).repeat(1, 1, num_points)
             return torch.cat([point_features, global_feat_repeat], 1), trans
+        
+def orthogonal_regularizer_loss(trans_matrix):
+    """
+    Computes the Frobenius norm penalty to enforce matrix orthogonality.
+    Equation: ||I - T T^T||^2
+    """
+    batch_size = trans_matrix.size(0)
+    iden = torch.eye(trans_matrix.size(1)).to(trans_matrix.device)
+    iden = iden.unsqueeze(0).repeat(batch_size, 1, 1)
+    
+    # compute T * T^T
+    trans_transpose = trans_matrix.transpose(1, 2)
+    product = torch.bmm(trans_matrix, trans_transpose)
+    
+    # compute squared frobenius norm penalty
+    loss = torch.mean(torch.norm(iden - product, p='fro', dim=(1, 2)) ** 2)
+    
+    return loss
