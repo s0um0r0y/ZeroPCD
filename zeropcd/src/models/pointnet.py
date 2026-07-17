@@ -88,7 +88,7 @@ class PointNetFeat(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         point_features = x # Keep track of local features [B, 64, N] 
         
-        x = F.relu(self.bn1(self.conv2(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
         x = self.bn3(self.conv3(x))
         
         # max pooling
@@ -120,3 +120,17 @@ def orthogonal_regularizer_loss(trans_matrix):
     loss = torch.mean(torch.norm(iden - product, p='fro', dim=(1, 2)) ** 2)
     
     return loss
+
+if __name__ == "__main__":
+    # Batch size = 4, Dimensions = 3 (X, Y, Z), Points = 512
+    simulated_cloud = torch.rand(4, 3, 512)
+    
+    model = PointNetFeat(num_points=512, global_feat=True)
+    global_feat, transform = model(simulated_cloud)
+    
+    reg_loss = orthogonal_regularizer_loss(transform)
+    
+    print(f"Input Shape: {simulated_cloud.shape}")
+    print(f"Global Feature Vector Shape: {global_feat.shape} (Expected: [4, 1024])")
+    print(f"Transformation Matrix Shape: {transform.shape} (Expected: [4, 3, 3])")
+    print(f"Initial Orthogonal Regularizer Loss Value: {reg_loss.item():.4f}")
