@@ -3,7 +3,7 @@ from turtle import forward
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import Dataloader
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.data.dataset import ModelNet10Dataset
@@ -59,4 +59,9 @@ def train():
     # mixed precision scaler
     scaler = torch.cuda.amp.GradScaler()
     
+    dataset_path = "data/raw/ModelNet10"
     
+    train_dataset = ModelNet10Dataset(dataset_path, valid=False, num_points=num_points)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    
+    print(f"Starting training for {epochs} epochs...")
