@@ -1,3 +1,4 @@
+from pickletools import optimize
 from turtle import forward
 import torch
 import torch.nn as nn
@@ -42,3 +43,20 @@ class PointNetClassifier(nn.Module):
         
         # Return raw class scores (logits) and the trans_matrix for the loss function
         return x, trans_matrix
+    
+def train():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Training on device: {device}")
+
+    epochs = 15
+    batch_size = 32 # 32 should fit easily on 6GB VRAM with 512 points
+    num_points = 512
+    
+    model = PointNetClassifier(num_classes=10).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    
+    # mixed precision scaler
+    scaler = torch.cuda.amp.GradScaler()
+    
+    
